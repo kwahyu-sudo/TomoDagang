@@ -9,3 +9,4 @@
 # workflow
 
 - Lakukan technical & non-technical challenge secara menyeluruh (cari celah/risiko) sebelum menulis spec atau implementasi. Confidence: 0.65
+- Minta approval sebelum memilih model AI untuk subagent/subtask, dan sertakan pertimbangan mengapa model tersebut direkomendasikan. Confidence: 0.82

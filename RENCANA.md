@@ -138,7 +138,38 @@ Modelkan **pembelian (procurement)** sebagai konsep inti, bukan supplier. Suppli
 
 ## Poin Diskusi Terbuka
 - [ ] Forecast: Moving Average dulu, atau langsung Exponential Smoothing?
-- [ ] Supplier: feature flag (tersembunyi awal) atau selalu tampil?
+- [ ] Supplier: feature flag (tersembunyi awal) atau selalu tampul?
 - [ ] Perlu modul supplier terpisah lebih detail?
 - [ ] Perlu export laporan PDF/Excel?
 - [ ] Perlu multi-user role (pemilik vs staff)?
+
+## Pengembangan Selanjutnya (v2) — di luar scope v1
+
+### Sinkronisasi Stok ke Marketplace (Multichannel)
+Kebutuhan: sinkronisasi stok makanan jadi (frozen food) antar platform
+e-commerce — Tokopedia, Shopee, GoFood, dll — dengan dashboard internal.
+
+**Status:** DITUNDA ke v2. Tidak masuk v1. v1 tetap fokus WhatsApp + dashboard
+internal (stok sebagai single source of truth, diisi hanya dari order manual,
+WA draft, dan pembelian bahan).
+
+**Catatan teknis (dikumpulkan saat diskusi v1):**
+- Tiap platform punya API & aturan berbeda. Shopee/Tokopedia butuh approval
+  merchant + partner API dengan rate limit ketat. GoFood/GrabFood lewat
+  aggregator (Butler/Mixture/H2H) — tidak ada API publik terbuka untuk UMKM kecil.
+- Sinkronisasi dua arah (stok ↔ order masuk) butuh penanganan race condition
+  antar-platform (bukan lagi sekadar `prisma.$transaction()` lokal).
+- Sebagian platform tidak punya webhook order → perlu polling berkala.
+- Ini produk baru (OMS/multichannel), bukan fitur tambahan — bentrok dengan
+  prinsip YAGNI v1.
+
+**Arah yang disepakati untuk v2 (belum diputus final):**
+- Mulai dari 1 platform dulu (kandidat: Shopee, API paling terbuka untuk UMKM).
+- Satu arah dulu (stok turun otomatis saat order masuk + push stok ke marketplace),
+  baru pertimbangkan dua arah (termasuk order masuk dari marketplace).
+- Atau evaluasi pakai aggregator pihak ketiga (Jubelio, Woownesia, dll) yang
+  sudah handle multichannel, sehingga dashboard cuma integrasi ke aggregator —
+  lebih murah dari bikin integrasi sendiri per platform.
+
+**Keputusan final (model, platform, satu/dua arah, aggregator vs bikin sendiri)
+ditunda ke sesi perencanaan v2.**
