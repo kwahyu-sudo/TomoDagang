@@ -52,10 +52,18 @@ export async function POST(req: NextRequest) {
         },
         include: { items: true },
       });
-      await sendMessage(from, "Pesanan kamu kami terima & sedang direview. Terima kasih!");
+      try {
+        await sendMessage(from, "Pesanan kamu kami terima & sedang direview. Terima kasih!");
+      } catch {
+        // draft tetap tersimpan walau notifikasi gagal
+      }
       return new NextResponse(JSON.stringify({ ok: true, id: pesanan.id }));
     }
-    await sendMessage(msg.from, "Halo! Ketik PESAN <nama produk> <jumlah> untuk order.");
+    try {
+      await sendMessage(msg.from, "Halo! Ketik PESAN <nama produk> <jumlah> untuk order.");
+    } catch {
+      // abaikan gagal kirim balasan
+    }
   }
   return new NextResponse("ok");
 }
