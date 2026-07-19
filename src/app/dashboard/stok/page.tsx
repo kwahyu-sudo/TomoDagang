@@ -1,30 +1,56 @@
 import { prisma } from "@/lib/prisma";
 
 export default async function StokPage() {
-  const produk = await prisma.produk.findMany();
+  const produk = await prisma.produk.findMany({ orderBy: { nama: "asc" } });
+  const low = produk.filter((p) => p.stok < p.minStok).length;
+
   return (
-    <div>
-      <h1>Stok Produk</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Stok</th>
-            <th>Min</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {produk.map((p) => (
-            <tr key={p.id}>
-              <td>{p.nama}</td>
-              <td>{p.stok}</td>
-              <td>{p.minStok}</td>
-              <td>{p.stok < p.minStok ? <span className="text-red-600">Menipis!</span> : "OK"}</td>
+    <div className="space-y-4u">
+      <header className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink">Stok Produk</h1>
+          <p className="text-sm text-ink-faint">
+            {produk.length} produk{low > 0 && ` · ${low} perlu restock`}
+          </p>
+        </div>
+        <button className="btn-primary">Tambah Produk</button>
+      </header>
+
+      <div className="card overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-canvas">
+            <tr>
+              <th className="th">Nama</th>
+              <th className="th">Stok</th>
+              <th className="th">Min</th>
+              <th className="th">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {produk.map((p) => (
+              <tr key={p.id}>
+                <td className="td font-medium">{p.nama}</td>
+                <td className="td">{p.stok} {p.satuan}</td>
+                <td className="td text-ink-faint">{p.minStok}</td>
+                <td className="td">
+                  {p.stok < p.minStok ? (
+                    <span className="badge-warn">Menipis</span>
+                  ) : (
+                    <span className="badge-ok">Stok aman</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {produk.length === 0 && (
+              <tr>
+                <td className="td text-ink-faint" colSpan={4}>
+                  Belum ada produk. Tambah lewat tombol di atas.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
