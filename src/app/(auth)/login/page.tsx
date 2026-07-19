@@ -17,7 +17,10 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={submit} className="max-w-sm mx-auto mt-20 space-y-4">
-      <h1 className="text-xl font-bold">Login Pemilik</h1>
+      <div className="text-center mb-4u">
+        <h1 className="text-3xl font-semibold text-ink">TomoDagang</h1>
+        <p className="text-sm text-ink-faint">Teman berdagang UMKM</p>
+      </div>
       <input className="border w-full p-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <input className="border w-full p-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       {error && <p className="text-red-600">{error}</p>}

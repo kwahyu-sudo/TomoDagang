@@ -1,4 +1,4 @@
-# Runbook Bantu-UMKM
+# Runbook TomoDagang
 
 ## Ganti token WhatsApp
 Edit `.env`: `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN`.

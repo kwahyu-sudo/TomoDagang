@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex min-h-screen">
       <aside className="w-60 shrink-0 border-r border-line bg-surface px-4 py-9u hidden sm:block">
         <div className="px-2 mb-9u">
-          <p className="text-lg font-semibold text-ink">Bantu-UMKM</p>
+          <p className="text-lg font-semibold text-ink">TomoDagang</p>
           <p className="text-xs text-ink-faint">{session.user?.email}</p>
         </div>
         <nav className="space-y-1">
