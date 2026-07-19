@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SumberPembelian {
+  BELANJA_SENDIRI
+  SUPPLIER
+}
+
+enum StatusPesanan {
+  BARU
+  DIPROSES
+  SELESAI
+  BATAL
+}
+
+enum SumberPesanan {
+  MANUAL
+  WHATSAPP
+}
+
+enum TipeTransaksi {
+  PEMASUKAN
+  PENGELUARAN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Produk {
+  id        String   @id @default(cuid())
+  nama      String
+  harga     Int
+  stok      Int      @default(0)
+  satuan    String
+  minStok   Int      @default(0)
+  createdAt DateTime @default(now())
+  items     PesananItem[]
+  logs      StokLog[] @relation("produkStok")
+}
+
+model BahanBaku {
+  id        String   @id @default(cuid())
+  nama      String
+  stok      Int      @default(0)
+  satuan    String
+  minStok   Int      @default(0)
+  createdAt DateTime @default(now())
+  pembelian PembelianBahan[]
+  logs      StokLog[] @relation("bahanStok")
+}
+
+model Transaksi {
+  id          String        @id @default(cuid())
+  tipe        TipeTransaksi
+  jumlah      Int
+  kategori    String
+  tanggal     DateTime      @default(now())
+  pesananId   String?       @unique
+  pembelianId String?       @unique
+  pesanan     Pesanan?      @relation(fields: [pesananId], references: [id])
+  pembelian   PembelianBahan? @relation(fields: [pembelianId], references: [id])
+}
+
+model Pesanan {
+  id          String        @id @default(cuid())
+  pelanggan   String
+  nomorWa     String?
+  total       Int           @default(0)
+  status      StatusPesanan @default(BARU)
+  sumber      SumberPesanan @default(MANUAL)
+  needsReview Boolean       @default(false)
+  paid        Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  items       PesananItem[]
+  transaksi   Transaksi?
+}
+
+model PesananItem {
+  id        String  @id @default(cuid())
+  pesananId String
+  produkId  String
+  qty       Int
+  harga     Int
+  pesanan   Pesanan @relation(fields: [pesananId], references: [id], onDelete: Cascade)
+  produk    Produk  @relation(fields: [produkId], references: [id])
+}
+
+model StokLog {
+  id        String   @id @default(cuid())
+  tipe      String   // "PRODUK" | "BAHAN"
+  refId     String
+  delta     Int
+  keterangan String
+  createdAt DateTime @default(now())
+  produk    Produk?  @relation("produkStok", fields: [refId], references: [id], map: "StokLog_produk_fkey")
+  bahan     BahanBaku? @relation("bahanStok", fields: [refId], references: [id], map: "StokLog_bahan_fkey")
+}
+
+model PembelianBahan {
+  id            String          @id @default(cuid())
+  tanggal       DateTime        @default(now())
+  bahanBakuId   String
+  qty           Int
+  hargaSatuan   Int
+  total         Int
+  sumber        SumberPembelian @default(BELANJA_SENDIRI)
+  supplierId    String?
+  catatan       String
+  bahanBaku     BahanBaku       @relation(fields: [bahanBakuId], references: [id])
+  supplier      Supplier?       @relation(fields: [supplierId], references: [id])
+  transaksi     Transaksi?
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  nama      String
+  kontakWa  String?
+  alamat    String?
+  catatan   String?
+  aktif     Boolean  @default(true)
+  pembelian PembelianBahan[]
+}
