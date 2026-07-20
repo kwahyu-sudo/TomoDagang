@@ -128,7 +128,7 @@ describe("API /api/pesanan", () => {
 
       // Setup transactional mock behaviors
       let capturedTx: any;
-      vi.mocked(prisma.$transaction).mockImplementation(async (cb) => {
+      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
         const tx = {
           produk: {
             findUnique: vi.fn().mockResolvedValue({ id: "prod1", stok: 10 }),
@@ -196,7 +196,7 @@ describe("API /api/pesanan", () => {
         }),
       });
 
-      vi.mocked(prisma.$transaction).mockImplementation(async (cb) => {
+      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
         const tx = {
           produk: {
             findUnique: vi.fn().mockResolvedValue({ id: "prod1", stok: 3 }), // Only 3 in stock, but request needs 5

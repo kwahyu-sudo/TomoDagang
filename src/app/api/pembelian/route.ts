@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
 import { requireAuth, apiHandler } from "@/lib/api-helpers";
+import { validatePositiveInt, validateNonNegativeInt, ValidationError } from "@/lib/validate";
 
 export const runtime = "nodejs";
 
@@ -22,6 +23,8 @@ export const POST = apiHandler(async (req: Request) => {
   if (b.sumber === "SUPPLIER" && !config.supplierEnabled) {
     return new NextResponse("supplier disabled", { status: 400 });
   }
+  validatePositiveInt(b.qty, "qty");
+  validateNonNegativeInt(b.hargaSatuan, "hargaSatuan");
   const total = b.qty * b.hargaSatuan;
   const pb = await prisma.$transaction(async (tx) => {
     const created = await tx.pembelianBahan.create({

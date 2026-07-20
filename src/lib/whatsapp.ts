@@ -1,9 +1,12 @@
 import crypto from "crypto";
 
-export function verifySignature(rawBody: string, signature: string | null, token: string): boolean {
-  if (!signature) return false;
-  const expected = "sha256=" + crypto.createHmac("sha256", token).update(rawBody).digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+export function verifySignature(rawBody: string, signature: string | null, secret: string): boolean {
+  if (!signature || !secret) return false;
+  const expected = "sha256=" + crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+  const sigBuf = Buffer.from(signature);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length) return false;
+  return crypto.timingSafeEqual(sigBuf, expBuf);
 }
 
 export async function sendMessage(to: string, text: string): Promise<void> {

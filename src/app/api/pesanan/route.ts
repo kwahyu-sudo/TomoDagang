@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, apiHandler } from "@/lib/api-helpers";
+import { validate, validatePositiveInt, validateNonNegativeInt, ValidationError } from "@/lib/validate";
 
 export const runtime = "nodejs";
 
@@ -18,7 +19,14 @@ export const POST = apiHandler(async (req: Request) => {
   const deny = await requireAuth();
   if (deny) return deny;
   const body = await req.json();
-  const items = body.items ?? [];
+  const items = Array.isArray(body.items) ? body.items : [];
+  if (items.length === 0) {
+    throw new ValidationError("Pesanan harus punya minimal 1 item.");
+  }
+  for (const it of items) {
+    validatePositiveInt(it?.qty, "items.qty");
+    validateNonNegativeInt(it?.harga, "items.harga");
+  }
   const total = items.reduce((s: number, it: { qty: number; harga: number }) => s + it.qty * it.harga, 0);
   const pesanan = await prisma.pesanan.create({
     data: {

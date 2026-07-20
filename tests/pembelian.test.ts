@@ -72,7 +72,7 @@ describe("API /api/pembelian", () => {
       ];
       vi.mocked(prisma.pembelianBahan.findMany).mockResolvedValue(mockPurchases as any);
 
-      const response = await GET();
+      const response = await GET(new Request("http://localhost/api/pembelian"));
       const json = await response.json();
 
       expect(prisma.pembelianBahan.findMany).toHaveBeenCalledWith({
@@ -118,7 +118,7 @@ describe("API /api/pembelian", () => {
       });
 
       let capturedTx: any;
-      vi.mocked(prisma.$transaction).mockImplementation(async (cb) => {
+      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
         const tx = {
           pembelianBahan: {
             create: vi.fn().mockResolvedValue({ id: "pembelian1", total: 50000 }),

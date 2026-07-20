@@ -38,23 +38,27 @@ model User {
 
 model Produk {
   id        String   @id @default(cuid())
-  nama      String
+  nama      String   @unique
   harga     Int
   stok      Int      @default(0)
   satuan    String
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   items     PesananItem[]
+
+  @@check(stok >= 0)
 }
 
 model BahanBaku {
   id        String   @id @default(cuid())
-  nama      String
+  nama      String   @unique
   stok      Int      @default(0)
   satuan    String
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   pembelian PembelianBahan[]
+
+  @@check(stok >= 0)
 }
 
 model Transaksi {

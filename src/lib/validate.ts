@@ -47,3 +47,19 @@ export function validateEnum<T extends string>(
   }
   return value as T;
 }
+
+/** Validates a non-negative integer (>= 0). Throws ValidationError otherwise. */
+export function validateNonNegativeInt(value: unknown, fieldName: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new ValidationError(`${fieldName} harus bilangan bulat >= 0.`);
+  }
+  return value;
+}
+
+/** Validates a positive integer (> 0). Throws ValidationError otherwise. */
+export function validatePositiveInt(value: unknown, fieldName: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
+    throw new ValidationError(`${fieldName} harus bilangan bulat > 0.`);
+  }
+  return value;
+}

@@ -19,44 +19,65 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-hub-signature-256");
-  if (!verifySignature(raw, sig, process.env.WHATSAPP_TOKEN ?? "")) {
+  if (!verifySignature(raw, sig, process.env.WHATSAPP_APP_SECRET ?? "")) {
     return new NextResponse("Invalid signature", { status: 401 });
   }
   const body = JSON.parse(raw);
   const entry = body.entry?.[0];
   const msg = entry?.changes?.[0]?.value?.messages?.[0];
   if (msg && msg.type === "text") {
-    const existing = await prisma.webhookProcessed.findUnique({ where: { messageId: msg.id } });
-    if (existing) return new NextResponse("ok");
-    await prisma.webhookProcessed.create({ data: { messageId: msg.id } });
+    const products = await prisma.produk.findMany({ select: { id: true, nama: true, harga: true } });
+    const parsed = parseMessage(msg.text.body, products.map((p) => ({ nama: p.nama })));
 
-    const products = await prisma.produk.findMany({ select: { nama: true } });
-    const parsed = parseMessage(msg.text.body, products);
     if (parsed.intent === "NEW_ORDER") {
       const from = msg.from;
-      const pesanan = await prisma.pesanan.create({
-        data: {
-          pelanggan: from,
-          nomorWa: from,
-          sumber: "WHATSAPP",
-          needsReview: parsed.unmatched.length > 0,
-          items: {
-            create: await Promise.all(
-              parsed.items.map(async (it) => {
-                const p = await prisma.produk.findFirst({ where: { nama: it.nama } });
-                return { produkId: p!.id, qty: it.qty, harga: p!.harga };
-              })
-            ),
-          },
-        },
-        include: { items: true },
-      });
+      // Resolusi produk harus sebelum transaksi untuk menghindari item null.
+      const resolved = await Promise.all(
+        parsed.items.map(async (it) => {
+          const p = await prisma.produk.findFirst({ where: { nama: it.nama } });
+          if (!p) return null;
+          return { produkId: p.id, qty: it.qty, harga: p.harga };
+        })
+      );
+      // Abaikan item yg produk tidak ditemukan; jika kosong, jangan buat pesanan.
+      const validItems = resolved.filter((x): x is { produkId: string; qty: number; harga: number } => x !== null);
+      if (validItems.length === 0) {
+        try {
+          await sendMessage(from, "Maaf, produk yang kamu pesan belum kami temukan.");
+        } catch {
+          // abaikan gagal kirim
+        }
+        return new NextResponse("ok");
+      }
+
+      // Atomic: dedupe (P2002) + create pesanan dalam satu transaksi.
+      try {
+        await prisma.$transaction(async (tx) => {
+          await tx.webhookProcessed.create({ data: { messageId: msg.id } });
+          await tx.pesanan.create({
+            data: {
+              pelanggan: from,
+              nomorWa: from,
+              sumber: "WHATSAPP",
+              needsReview: parsed.unmatched.length > 0 || validItems.length !== parsed.items.length,
+              items: { create: validItems },
+            },
+          });
+        });
+      } catch (err: unknown) {
+        // P2002 = messageId sudah diproses (dedupe aman, retry diizinkan karena belum ke-create).
+        if ((err as { code?: string })?.code === "P2002") {
+          return new NextResponse("ok");
+        }
+        throw err;
+      }
+
       try {
         await sendMessage(from, "Pesanan kamu kami terima & sedang direview. Terima kasih!");
       } catch {
         // draft tetap tersimpan walau notifikasi gagal
       }
-      return new NextResponse(JSON.stringify({ ok: true, id: pesanan.id }));
+      return new NextResponse(JSON.stringify({ ok: true }));
     }
     try {
       await sendMessage(msg.from, "Halo! Ketik PESAN <nama produk> <jumlah> untuk order.");

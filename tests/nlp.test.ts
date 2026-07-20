@@ -23,4 +23,18 @@ describe("nlp", () => {
     const r = parseMessage("halo kak", products);
     expect(r.intent).toBe("OTHER");
   });
+  it("L1: substring produk tidak memicu false-positive (pesona/border)", () => {
+    const r = parseMessage("pesona saya cantik border 5", products);
+    expect(r.items).toEqual([]);
+    expect(r.intent).toBe("OTHER");
+  });
+  it("L2: parse ribuan dengan titik (1.000) dan kata angka (dua)", () => {
+    const r = parseMessage("PESAN kue lapis 1.000, es teh dua", products);
+    expect(r.items).toEqual([{ nama: "kue lapis", qty: 1000 }, { nama: "es teh", qty: 2 }]);
+  });
+  it("L2: gagal parse pesanan kosong (items=[]) = OTHER", () => {
+    const r = parseMessage("PESAN dong", products);
+    expect(r.items).toEqual([]);
+    expect(r.intent).toBe("OTHER");
+  });
 });
