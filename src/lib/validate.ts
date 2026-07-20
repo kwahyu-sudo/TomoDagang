@@ -37,17 +37,6 @@ export function validate<T extends Record<string, unknown>>(
   return obj as T;
 }
 
-export function validateEnum<T extends string>(
-  value: unknown,
-  allowed: readonly T[],
-  fieldName: string
-): T {
-  if (!allowed.includes(value as T)) {
-    throw new ValidationError(`${fieldName} harus salah satu dari: ${allowed.join(", ")}.`);
-  }
-  return value as T;
-}
-
 /** Validates a non-negative integer (>= 0). Throws ValidationError otherwise. */
 export function validateNonNegativeInt(value: unknown, fieldName: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {

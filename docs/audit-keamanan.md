@@ -99,13 +99,13 @@ Branch: `feature/bantu-umkm-dashboard` (commit `32784fc`)
 - [x] C3 middleware auth (`requireAuth` + `apiHandler` di semua /api/*)
 - [x] C1 WHATSAPP_APP_SECRET — webhook pakai secret terpisah (commit c40 lanjutan)
 - [x] C2 timingSafeEqual guard (length check sebelum compare)
-- [ ] C4 rate-limit (belum ada throttle di auth/webhook/API)
+- [x] C4 rate-limit — `src/middleware.ts` in-memory sliding-window per IP (auth 10/mnt, webhook 30/mnt, api 60/mnt)
 - [x] D1 atomic dedupe (webhookProcessed.create + pesanan.create dalam 1 `$transaction`, P2002 = dedupe aman)
-- [x] D2 stok >= 0 + `@@check(stok >= 0)` di Produk & BahanBaku
+- [ ] D2 stok >= 0 — **`@@check(stok >= 0)` TIDAK ada di schema** (Prisma CLI tidak menerapkannya ke migrasi/SQL; cek ulang). Proteksi stok >= 0 di-enforce di application layer (validasi qty/harga + guard di route), bukan DB constraint. Perlu diputuskan: tambah constraint via raw SQL migration atau cukup di app layer.
 - [x] D3 findFirst aman (filter null + `Produk.nama`/`BahanBaku.nama` `@unique`)
 - [x] D6 validasi negatif (qty/harga positif via `validatePositiveInt`/`validateNonNegativeInt`)
-- [x] D4 total sinkron (fallback `total || items.reduce` di UI)
-- [ ] D5 onDelete + StokLog (PesananItem onDelete Cascade sudah ada; StokLog.refId masih dangling)
+- [x] D4 total sinkron (fallback `total || items.reduce` di UI) + **P1**: webhook WHATSAPP sekarang hitung `total` dari `validItems` sebelum `pesanan.create` (sebelumnya total=0 → laporan keuangan WA order Rp0)
+- [ ] D5 onDelete + StokLog (PesananItem onDelete Cascade sudah ada; StokLog.refId masih dangling — pending keputusan soft-delete vs cascade)
 - [x] L1/L2/L5/L6 NLP + validasi (word-boundary, parse ribuan/kata angka, validasi skema POST)
 
 ## Log Perbaikan (lanjutan audit)
@@ -119,7 +119,7 @@ Metode: systematic-debugging (root cause → fix → verifikasi test).
 | C2 | `timingSafeEqual` throw kalau panjang buffer beda | Length guard `sigBuf.length !== expBuf.length` → return false | `src/lib/whatsapp.ts` |
 | D1+L6 | check-then-create dedupe di luar transaksi → race (pesanan ganda) & non-atomic (pesanan hilang kalau create gagal) | Pindah `webhookProcessed.create` + `pesanan.create` ke dalam `$transaction`; tangkap `P2002` sebagai dedupe aman | `src/app/api/webhook/whatsapp/route.ts` |
 | D3 | `findFirst({where:{nama}})` bisa null → `p!.id` throw 500; nama produk tidak unique | Filter null sebelum create; `Produk.nama` & `BahanBaku.nama` `@unique` | `src/app/api/webhook/whatsapp/route.ts`, `prisma/schema.prisma` |
-| D2 | `stok Int` tanpa constraint → bisa negatif | `@@check(stok >= 0)` di Produk & BahanBaku | `prisma/schema.prisma` |
+| D2 | `stok Int` tanpa constraint DB → bisa negatif | Validasi input qty/harga positif + guard di route (app-layer). Catatan: `@@check(stok >= 0)` **tidak** diterapkan ke schema/migrasi (Prisma CLI tidak meng-emit constraint ini) — lihat Status D2 | `src/lib/validate.ts`, `src/app/api/pesanan/route.ts`, `src/app/api/pembelian/route.ts` |
 | D6 | `validate` hanya cek tipe, bukan nilai → `qty:-5` lolos | `validatePositiveInt`/`validateNonNegativeInt` di POST pesanan & pembelian | `src/lib/validate.ts`, `src/app/api/pesanan/route.ts`, `src/app/api/pembelian/route.ts` |
 | L1/L2 | regex tanpa word-boundary (`pesona`/`border` false-positive); tidak parse `1.000`/kata angka | `\b` boundary + `parseQty` (ribuan titik + kamus angka) | `src/lib/nlp.ts` |
 
@@ -129,6 +129,10 @@ Verifikasi:
 - Schema berubah (`@@check`, `@unique`) → butuh `npx prisma db push` / migrate sebelum deploy.
 
 Sisa (belum dikerjakan, bukan blokir kritis):
-- **C4** rate-limit (brute-force & webhook spam masih terbuka).
-- **D5** StokLog.refId dangling (produk/bahan dihapus → refId nunjuk ID terhapus; pertimbangkan soft-delete atau cascade log).
+- **P1** ✅ selesai: webhook WHATSAPP hitung `total` dari `validItems` (sebelumnya Rp0).
+- **P3** ✅ selesai: `src/middleware.ts` rate-limiter in-memory (auth 10/mnt, webhook 30/mnt, api 60/mnt per IP).
+- **P4** ✅ selesai: hapus `validateEnum` (0 usage) + hapus `mockup-dashboard.html`.
+- **D5** ✅ selesai (soft-delete): `Produk` & `BahanBaku` dapat field `deletedAt DateTime?`; semua read query (`produk/route.ts`, `bahan/route.ts`, `stok/page.tsx`, webhook `findMany`/`findFirst`) filter `where: { deletedAt: null }`. StokLog tidak di-cascade → riwayat tetap utuh untuk audit trail. **Perlu migrasi:** `npx prisma migrate dev --name soft_delete_produk_bahan` (atau `db push`) sebelum deploy — belum dijalankan di env ini (butuh koneksi DB).
+- **D2** constraint DB `stok >= 0` (saat ini app-layer saja; perlu raw SQL migration atau cukup app-layer?).
 - IP allowlist webhook (C1 partial) — Meta sudah validasi via HMAC, allowlist opsional.
+- Supplier: model + `supplierId`/`config.supplierEnabled` dipertahankan untuk v2 (belum ada CRUD/UI).

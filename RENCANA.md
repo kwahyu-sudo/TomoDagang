@@ -118,6 +118,8 @@ Modelkan **pembelian (procurement)** sebagai konsep inti, bukan supplier. Suppli
 
 ### [DISKUSI] Feature flag supplier vs selalu tampil sejak awal?
 
+> **Keputusan (2026-07-20):** Supplier **DITUNDA ke v2** ("biarkan dulu"). Model `Supplier` + field `supplierId` di `PembelianBahan` + flag `config.supplierEnabled` tetap ada di schema, tapi **belum** dibuat endpoint `/api/supplier` maupun UI. Tidak dihapus agar tidak ada migrasi struktural; diaktifkan bertahap saat v2. Lihat `docs/CHANGELOG.md` & `docs/audit-keamanan.md` (P2).
+
 ## Langkah Implementasi
 1. Scaffold Next.js + TS + Tailwind di `Bantu-UMKM`.
 2. Setup Prisma + koneksi PostgreSQL + `schema.prisma` (semua model).

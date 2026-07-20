@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const entry = body.entry?.[0];
   const msg = entry?.changes?.[0]?.value?.messages?.[0];
   if (msg && msg.type === "text") {
-    const products = await prisma.produk.findMany({ select: { id: true, nama: true, harga: true } });
+    const products = await prisma.produk.findMany({ where: { deletedAt: null }, select: { id: true, nama: true, harga: true } });
     const parsed = parseMessage(msg.text.body, products.map((p) => ({ nama: p.nama })));
 
     if (parsed.intent === "NEW_ORDER") {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       // Resolusi produk harus sebelum transaksi untuk menghindari item null.
       const resolved = await Promise.all(
         parsed.items.map(async (it) => {
-          const p = await prisma.produk.findFirst({ where: { nama: it.nama } });
+          const p = await prisma.produk.findFirst({ where: { nama: it.nama, deletedAt: null } });
           if (!p) return null;
           return { produkId: p.id, qty: it.qty, harga: p.harga };
         })
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Atomic: dedupe (P2002) + create pesanan dalam satu transaksi.
+      const total = validItems.reduce((s, it) => s + it.qty * it.harga, 0);
       try {
         await prisma.$transaction(async (tx) => {
           await tx.webhookProcessed.create({ data: { messageId: msg.id } });
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
               pelanggan: from,
               nomorWa: from,
               sumber: "WHATSAPP",
+              total,
               needsReview: parsed.unmatched.length > 0 || validItems.length !== parsed.items.length,
               items: { create: validItems },
             },

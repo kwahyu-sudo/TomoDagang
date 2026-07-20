@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validate, validateEnum, ValidationError } from "@/lib/validate";
+import { validate, ValidationError } from "@/lib/validate";
 
 describe("validate", () => {
   it("valid object passes", () => {
@@ -28,15 +28,5 @@ describe("validate", () => {
 
   it("null body throws", () => {
     expect(() => validate(null, { nama: "string" })).toThrow(ValidationError);
-  });
-});
-
-describe("validateEnum", () => {
-  it("valid enum passes", () => {
-    expect(validateEnum("BARU", ["BARU", "SELESAI"] as const, "status")).toBe("BARU");
-  });
-
-  it("invalid enum throws", () => {
-    expect(() => validateEnum("INVALID", ["BARU", "SELESAI"] as const, "status")).toThrow(ValidationError);
   });
 });

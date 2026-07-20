@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import TambahProdukForm from "@/components/TambahProdukForm";
 
 export default async function StokPage() {
-  const produk = await prisma.produk.findMany({ orderBy: { nama: "asc" } });
+  const produk = await prisma.produk.findMany({ where: { deletedAt: null }, orderBy: { nama: "asc" } });
   const low = produk.filter((p) => p.stok < p.minStok).length;
 
   return (

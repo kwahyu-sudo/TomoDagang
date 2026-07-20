@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const GET = apiHandler(async () => {
   const deny = await requireAuth();
   if (deny) return deny;
-  return NextResponse.json(await prisma.bahanBaku.findMany({ orderBy: { nama: "asc" } }));
+  return NextResponse.json(await prisma.bahanBaku.findMany({ where: { deletedAt: null }, orderBy: { nama: "asc" } }));
 });
 
 export const POST = apiHandler(async (req: Request) => {

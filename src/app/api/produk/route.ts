@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const GET = apiHandler(async () => {
   const deny = await requireAuth();
   if (deny) return deny;
-  const data = await prisma.produk.findMany({ orderBy: { nama: "asc" } });
+  const data = await prisma.produk.findMany({ where: { deletedAt: null }, orderBy: { nama: "asc" } });
   return NextResponse.json(data);
 });
 
