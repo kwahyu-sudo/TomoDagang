@@ -16,15 +16,15 @@ export default function LoginPage() {
   }
 
   return (
-    <form onSubmit={submit} className="max-w-sm mx-auto mt-20 space-y-4">
+    <form onSubmit={submit} className="max-w-sm mx-auto mt-20 space-y-4u">
       <div className="text-center mb-4u">
         <h1 className="text-3xl font-semibold text-ink">TomoDagang</h1>
         <p className="text-sm text-ink-faint">Teman berdagang UMKM</p>
       </div>
-      <input className="border w-full p-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input className="border w-full p-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      {error && <p className="text-red-600">{error}</p>}
-      <button className="bg-black text-white px-4 py-2" type="submit">Masuk</button>
+      <input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      {error && <p className="text-danger-ink text-sm">{error}</p>}
+      <button className="btn-primary w-full" type="submit">Masuk</button>
     </form>
   );
 }

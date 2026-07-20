@@ -5,6 +5,8 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const items = body.items ?? [];
+  const total = items.reduce((s: number, it: { qty: number; harga: number }) => s + it.qty * it.harga, 0);
   const pesanan = await prisma.pesanan.create({
     data: {
       pelanggan: body.pelanggan,
@@ -12,7 +14,8 @@ export async function POST(req: NextRequest) {
       sumber: body.sumber ?? "MANUAL",
       paid: body.paid ?? false,
       needsReview: body.needsReview ?? false,
-      items: { create: body.items },
+      total,
+      items: { create: items },
     },
   });
   return NextResponse.json(pesanan);

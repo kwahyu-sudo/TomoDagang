@@ -6,6 +6,7 @@ import Link from "next/link";
 const nav = [
   { href: "/dashboard", label: "Ringkasan" },
   { href: "/dashboard/stok", label: "Stok" },
+  { href: "/dashboard/stok/log", label: "Riwayat Stok" },
   { href: "/dashboard/bahan-baku", label: "Bahan Baku" },
   { href: "/dashboard/keuangan", label: "Keuangan" },
   { href: "/dashboard/pesanan", label: "Pesanan" },

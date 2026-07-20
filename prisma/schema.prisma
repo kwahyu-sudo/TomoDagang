@@ -130,3 +130,9 @@ model Supplier {
   aktif     Boolean  @default(true)
   pembelian PembelianBahan[]
 }
+
+model WebhookProcessed {
+  id        String   @id @default(cuid())
+  messageId String   @unique
+  createdAt DateTime @default(now())
+}

@@ -5,8 +5,6 @@ import { parseMessage } from "@/lib/nlp";
 
 export const runtime = "nodejs";
 
-const processed = new Set<string>();
-
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const mode = params.get("hub.mode");
@@ -28,8 +26,9 @@ export async function POST(req: NextRequest) {
   const entry = body.entry?.[0];
   const msg = entry?.changes?.[0]?.value?.messages?.[0];
   if (msg && msg.type === "text") {
-    if (processed.has(msg.id)) return new NextResponse("ok");
-    processed.add(msg.id);
+    const existing = await prisma.webhookProcessed.findUnique({ where: { messageId: msg.id } });
+    if (existing) return new NextResponse("ok");
+    await prisma.webhookProcessed.create({ data: { messageId: msg.id } });
 
     const products = await prisma.produk.findMany({ select: { nama: true } });
     const parsed = parseMessage(msg.text.body, products);
