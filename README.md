@@ -3,21 +3,23 @@
 Dashboard internal single-tenant untuk UMKM. Kelola stok, bahan baku, keuangan, pesanan, analitik tren, forecast, dan integrasi WhatsApp Business Cloud API.
 
 ## Tech Stack
-- **Framework:** Next.js (App Router)
+- **Framework:** Next.js 15 (App Router)
 - **Database ORM:** Prisma + PostgreSQL
 - **Gaya / UI:** Tailwind CSS
+- **Auth:** NextAuth (credentials)
 - **Testing:** Vitest
 - **Bahasa:** TypeScript
 
 ## Fitur Utama
 1. **Stok & Produk:** CRUD stok produk, pelacakan stok menipis (alert), histori stok.
 2. **Bahan Baku:** Kelola bahan baku, transaksi belanja bahan otomatis tercatat di modul keuangan.
-3. **Keuangan:** Laporan pengeluaran, pemasukan, laba rugi, dan grafik performa bisnis.
+3. **Keuangan:** Laporan pengeluaran, pemasukan, laba rugi.
 4. **Pemesanan:** CRUD pesanan, integrasi otomatis mengurangi stok & mencatat keuangan.
-5. **WhatsApp Integration:** Webhook terima order otomatis dan API notifikasi status pesanan serta limit stok.
-6. **Analitik & Perkiraan:** Tren grafik penjualan dan perkiraan pesanan (moving average/exponential smoothing).
+5. **WhatsApp Integration:** Webhook terima order otomatis dan API notifikasi status pesanan.
+6. **Analitik & Perkiraan:** Tren penjualan dan perkiraan pesanan (moving average/exponential smoothing).
 
 ## Setup
+
 ### 1. Instalasi Dependensi
 ```bash
 npm install
@@ -40,7 +42,8 @@ NEXTAUTH_URL=http://localhost:3000
 ```bash
 npx prisma db push
 npx prisma generate
-npm run seed:demo
+npm run seed          # user owner saja
+npm run seed:demo     # data demo (jangan di production)
 ```
 
 ### 4. Menjalankan Server Lokal
@@ -48,7 +51,39 @@ npm run seed:demo
 npm run dev
 ```
 
-### 5. Jalankan Unit Test
+### 5. Menjalankan Tes
 ```bash
 npm run test
 ```
+
+### 6. Build Production
+```bash
+npm run build
+npm run start
+```
+
+## Struktur Proyek
+```
+TomoDagang/
+├─ prisma/schema.prisma
+├─ src/
+│  ├─ app/
+│  │  ├─ (auth)/login/
+│  │  ├─ dashboard/
+│  │  │  ├─ stok/
+│  │  │  ├─ bahan-baku/
+│  │  │  ├─ keuangan/
+│  │  │  ├─ pesanan/
+│  │  │  └─ analitik/
+│  │  └─ api/
+│  │     ├─ webhook/whatsapp/route.ts
+│  │     ├─ produk/  bahan/  transaksi/  pesanan/  pembelian/
+│  ├─ lib/ (prisma, whatsapp, auth, forecast, nlp, validate, config)
+│  ├─ components/ (TambahProdukForm, CatatPembelianForm)
+├─ tests/
+├─ docs/runbook.md
+├─ .env.example
+```
+
+## Lisensi
+Private.

@@ -45,7 +45,6 @@ model Produk {
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   items     PesananItem[]
-  logs      StokLog[] @relation("produkStok")
 }
 
 model BahanBaku {
@@ -56,7 +55,6 @@ model BahanBaku {
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   pembelian PembelianBahan[]
-  logs      StokLog[] @relation("bahanStok")
 }
 
 model Transaksi {
@@ -96,14 +94,12 @@ model PesananItem {
 }
 
 model StokLog {
-  id        String   @id @default(cuid())
-  tipe      String   // "PRODUK" | "BAHAN"
-  refId     String
-  delta     Int
+  id         String   @id @default(cuid())
+  tipe       String   // "PRODUK" | "BAHAN"
+  refId      String   // ID of Produk or BahanBaku depending on tipe
+  delta      Int
   keterangan String
-  createdAt DateTime @default(now())
-  produk    Produk?  @relation("produkStok", fields: [refId], references: [id], map: "StokLog_produk_fkey")
-  bahan     BahanBaku? @relation("bahanStok", fields: [refId], references: [id], map: "StokLog_bahan_fkey")
+  createdAt  DateTime @default(now())
 }
 
 model PembelianBahan {

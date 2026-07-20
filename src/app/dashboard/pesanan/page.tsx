@@ -35,7 +35,9 @@ export default async function PesananPage() {
                   {p.pelanggan}
                   {p.needsReview && <span className="badge-warn ml-2">review</span>}
                 </td>
-                <td className="td">Rp{new Intl.NumberFormat("id-ID").format(p.total)}</td>
+                <td className="td">Rp{new Intl.NumberFormat("id-ID").format(
+                  p.total || p.items.reduce((s, it) => s + it.qty * it.harga, 0)
+                )}</td>
                 <td className="td">
                   <span className="badge-ok">{p.status}</span>
                 </td>

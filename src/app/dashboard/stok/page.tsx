@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import TambahProdukForm from "@/components/TambahProdukForm";
 
 export default async function StokPage() {
   const produk = await prisma.produk.findMany({ orderBy: { nama: "asc" } });
@@ -13,7 +14,7 @@ export default async function StokPage() {
             {produk.length} produk{low > 0 && ` · ${low} perlu restock`}
           </p>
         </div>
-        <button className="btn-primary">Tambah Produk</button>
+        <TambahProdukForm />
       </header>
 
       <div className="card overflow-hidden">

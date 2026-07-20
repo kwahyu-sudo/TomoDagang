@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
+import CatatPembelianForm from "@/components/CatatPembelianForm";
 
 export default async function BahanPage() {
   const bahan = await prisma.bahanBaku.findMany({ orderBy: { nama: "asc" } });
@@ -45,36 +46,10 @@ export default async function BahanPage() {
         </table>
       </div>
 
-      <section className="card p-4u space-y-4u max-w-lg">
-        <h2 className="text-lg font-semibold text-ink">Catat Pembelian</h2>
-        <form action="/api/pembelian" method="post" className="space-y-4u">
-          <div>
-            <label className="label" htmlFor="bahanBakuId">ID Bahan</label>
-            <input id="bahanBakuId" name="bahanBakuId" className="input" required />
-          </div>
-          <div className="grid grid-cols-2 gap-4u">
-            <div>
-              <label className="label" htmlFor="qty">Qty</label>
-              <input id="qty" name="qty" type="number" className="input" required />
-            </div>
-            <div>
-              <label className="label" htmlFor="hargaSatuan">Harga Satuan</label>
-              <input id="hargaSatuan" name="hargaSatuan" type="number" className="input" required />
-            </div>
-          </div>
-          <div>
-            <label className="label" htmlFor="catatan">Catatan</label>
-            <input id="catatan" name="catatan" className="input" placeholder="mis. pasar X" required />
-          </div>
-          {config.supplierEnabled && (
-            <div>
-              <label className="label" htmlFor="supplierId">Supplier (opsional)</label>
-              <input id="supplierId" name="supplierId" className="input" />
-            </div>
-          )}
-          <button type="submit" className="btn-primary">Simpan Pembelian</button>
-        </form>
-      </section>
+      <CatatPembelianForm
+        bahanList={bahan.map((b) => ({ id: b.id, nama: b.nama }))}
+        supplierEnabled={config.supplierEnabled}
+      />
     </div>
   );
 }

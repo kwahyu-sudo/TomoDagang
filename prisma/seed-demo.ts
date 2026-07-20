@@ -9,18 +9,36 @@ async function main() {
     create: { email: "demo@umkm.id", password },
   });
   const kue = await prisma.produk.create({
-    data: { nama: "Kue Lapis", harga: 15000, stok: 20, satuan: "pcs", minStok: 5 },
+    data: { nama: "Kue Lapis", harga: 15000, stok: 18, satuan: "pcs", minStok: 5 },
   });
-  await prisma.bahanBaku.create({
+  const gula = await prisma.bahanBaku.create({
     data: { nama: "Gula", stok: 10, satuan: "kg", minStok: 3 },
   });
-  await prisma.pesanan.create({
+  const pesanan = await prisma.pesanan.create({
     data: {
       pelanggan: "Budi",
       total: 30000,
       status: "SELESAI",
       paid: true,
       items: { create: [{ produkId: kue.id, qty: 2, harga: 15000 }] },
+    },
+  });
+  // Transaksi pemasukan terkait pesanan
+  await prisma.transaksi.create({
+    data: {
+      tipe: "PEMASUKAN",
+      jumlah: 30000,
+      kategori: "penjualan",
+      pesananId: pesanan.id,
+    },
+  });
+  // StokLog untuk pengurangan stok produk
+  await prisma.stokLog.create({
+    data: {
+      tipe: "PRODUK",
+      refId: kue.id,
+      delta: -2,
+      keterangan: "pesanan demo",
     },
   });
   console.log("Seeded DEMO data. JANGAN jalankan di production.");

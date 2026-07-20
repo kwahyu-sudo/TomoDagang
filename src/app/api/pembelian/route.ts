@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
+import { requireAuth, apiHandler } from "@/lib/api-helpers";
 
 export const runtime = "nodejs";
 
-export async function POST(req: NextRequest) {
+export const GET = apiHandler(async () => {
+  const deny = await requireAuth();
+  if (deny) return deny;
+  const data = await prisma.pembelianBahan.findMany({
+    include: { bahanBaku: true },
+    orderBy: { tanggal: "desc" },
+  });
+  return NextResponse.json(data);
+});
+
+export const POST = apiHandler(async (req: Request) => {
+  const deny = await requireAuth();
+  if (deny) return deny;
   const b = await req.json();
   if (b.sumber === "SUPPLIER" && !config.supplierEnabled) {
     return new NextResponse("supplier disabled", { status: 400 });
@@ -28,4 +41,4 @@ export async function POST(req: NextRequest) {
     return created;
   });
   return NextResponse.json(pb);
-}
+});

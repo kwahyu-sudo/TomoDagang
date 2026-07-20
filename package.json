@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "prisma:generate": "prisma generate",
     "seed": "tsx prisma/seed.ts",
+    "seed:prod": "tsx prisma/seed.ts",
     "seed:demo": "tsx prisma/seed-demo.ts",
     "test": "vitest run"
   },
@@ -12,9 +16,13 @@
     "@prisma/client": "^5.22.0",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
-    "next-auth": "^4.24.14"
+    "next": "^15.3.0",
+    "next-auth": "^4.24.14",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

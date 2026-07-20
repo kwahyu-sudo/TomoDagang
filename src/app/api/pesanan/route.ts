@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuth, apiHandler } from "@/lib/api-helpers";
 
 export const runtime = "nodejs";
 
-export async function POST(req: NextRequest) {
+export const GET = apiHandler(async () => {
+  const deny = await requireAuth();
+  if (deny) return deny;
+  const data = await prisma.pesanan.findMany({
+    include: { items: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return NextResponse.json(data);
+});
+
+export const POST = apiHandler(async (req: Request) => {
+  const deny = await requireAuth();
+  if (deny) return deny;
   const body = await req.json();
   const items = body.items ?? [];
   const total = items.reduce((s: number, it: { qty: number; harga: number }) => s + it.qty * it.harga, 0);
@@ -19,9 +32,11 @@ export async function POST(req: NextRequest) {
     },
   });
   return NextResponse.json(pesanan);
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = apiHandler(async (req: Request) => {
+  const deny = await requireAuth();
+  if (deny) return deny;
   const { id, status, paid } = await req.json();
   const pesanan = await prisma.pesanan.findUnique({ where: { id }, include: { items: true } });
   if (!pesanan) return new NextResponse("not found", { status: 404 });
@@ -46,4 +61,4 @@ export async function PATCH(req: NextRequest) {
     }
   });
   return NextResponse.json({ ok: true });
-}
+});

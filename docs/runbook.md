@@ -9,18 +9,32 @@ Restart `npm run dev`.
 
 ## Webhook error
 - Pastikan URL publik (ngrok/deploy) mengarah ke `/api/webhook/whatsapp`.
-- Cek log: signature invalid = token salah. Draft dobel = dedupe aktif.
+- Cek log: signature invalid = token salah. Draft dobel = dedupe aktif (via tabel `WebhookProcessed`).
 - Meta timeout 20 detik — pastikan response cepat.
 
 ## Reset password owner
-Jalankan script bcrypt manual atau seed ulang `seed:prod`.
+Jalankan script bcrypt manual atau seed ulang `npm run seed`.
 
 ## Seed
-- Production: `npm run seed` (jalankan `prisma/seed.ts`)
+- Production: `npm run seed` atau `npm run seed:prod` (jalankan `prisma/seed.ts`)
 - Demo (JANGAN di prod): `npm run seed:demo` (jalankan `prisma/seed-demo.ts`)
 
 ## Menjalankan lokal
 1. `npm install` (pastikan NODE_ENV bukan production agar devDeps terinstall)
 2. Isi `.env` dari `.env.example`
-3. `npx prisma migrate dev` (buat tabel)
-4. `npm run dev`
+3. `npx prisma db push` (buat tabel)
+4. `npx prisma generate`
+5. `npm run seed` (buat user owner)
+6. `npm run dev`
+
+## Menjalankan tes
+```bash
+# Unit tests
+npm run test
+
+# TypeScript check
+npx tsc --noEmit
+
+# Build check
+npm run build
+```
