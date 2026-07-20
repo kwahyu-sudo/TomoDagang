@@ -1,0 +1,24 @@
+name: Manage Neon Branch
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+jobs:
+  neon_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Neon Branch
+        if: github.event.action != 'closed'
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Delete Neon Branch
+        if: github.event.action == 'closed'
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}

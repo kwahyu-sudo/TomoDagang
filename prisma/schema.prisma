@@ -45,8 +45,6 @@ model Produk {
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   items     PesananItem[]
-
-  @@check(stok >= 0)
 }
 
 model BahanBaku {
@@ -57,8 +55,6 @@ model BahanBaku {
   minStok   Int      @default(0)
   createdAt DateTime @default(now())
   pembelian PembelianBahan[]
-
-  @@check(stok >= 0)
 }
 
 model Transaksi {

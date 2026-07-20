@@ -7,3 +7,4 @@ node_modules/
 tsconfig.tsbuildinfo
 playwright-report/
 test-results/
+.db/db url.txt
