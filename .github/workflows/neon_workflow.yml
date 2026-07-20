@@ -4,19 +4,41 @@ on:
     types: [opened, reopened, synchronize, closed]
 
 jobs:
-  neon_branch:
+  create_branch:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Create Neon Branch
-        if: github.event.action != 'closed'
+        id: create-branch
         uses: neondatabase/create-branch-action@v6
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           branch_name: pr-${{ github.event.number }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Push schema to PR branch
+        run: npx prisma db push --accept-data-loss
+        env:
+          DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
+          DIRECT_URL: ${{ steps.create-branch.outputs.db_url }}
+
+  delete_branch:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
       - name: Delete Neon Branch
-        if: github.event.action == 'closed'
         uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}

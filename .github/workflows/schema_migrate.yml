@@ -1,0 +1,39 @@
+name: Schema Migration
+
+on:
+  push:
+    branches: [main, feature/*]
+    paths:
+      - 'prisma/schema.prisma'
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get Neon connection string
+        id: neon
+        run: |
+          CONN=$(npx -y neon connection-string --project-id ${{ vars.NEON_PROJECT_ID }} 2>/dev/null)
+          # Pooled URL for app runtime
+          echo "DATABASE_URL=${CONN}" >> $GITHUB_ENV
+          # Direct URL for Prisma CLI (remove -pooler suffix)
+          DIRECT=$(echo "$CONN" | sed 's/-pooler//')
+          echo "DIRECT_URL=${DIRECT}" >> $GITHUB_ENV
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+
+      - name: Push schema to Neon
+        run: npx prisma db push --accept-data-loss

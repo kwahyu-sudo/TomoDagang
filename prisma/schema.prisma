@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum SumberPembelian {
@@ -37,23 +38,25 @@ model User {
 }
 
 model Produk {
-  id        String   @id @default(cuid())
-  nama      String   @unique
+  id        String    @id @default(cuid())
+  nama      String    @unique
   harga     Int
-  stok      Int      @default(0)
+  stok      Int       @default(0)
   satuan    String
-  minStok   Int      @default(0)
-  createdAt DateTime @default(now())
+  minStok   Int       @default(0)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
   items     PesananItem[]
 }
 
 model BahanBaku {
-  id        String   @id @default(cuid())
-  nama      String   @unique
-  stok      Int      @default(0)
+  id        String    @id @default(cuid())
+  nama      String    @unique
+  stok      Int       @default(0)
   satuan    String
-  minStok   Int      @default(0)
-  createdAt DateTime @default(now())
+  minStok   Int       @default(0)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
   pembelian PembelianBahan[]
 }
 
