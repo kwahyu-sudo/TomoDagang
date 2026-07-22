@@ -6,6 +6,7 @@ export default async function PesananPage() {
   const pesanan = await prisma.pesanan.findMany({
     include: { items: true },
     orderBy: { createdAt: "desc" },
+    take: 50,
   });
   const draft = pesanan.filter((p) => p.needsReview).length;
 

@@ -5,8 +5,8 @@ import SummaryCard from "@/components/SummaryCard";
 export default async function DashboardHome() {
   const [produk, pesanan, tr] = await Promise.all([
     prisma.produk.findMany({ where: { deletedAt: null } }),
-    prisma.pesanan.findMany(),
-    prisma.transaksi.findMany(),
+    prisma.pesanan.findMany({ take: 100 }),
+    prisma.transaksi.findMany({ take: 100 }),
   ]);
 
   const low = produk.filter((p) => p.stok < p.minStok).length;

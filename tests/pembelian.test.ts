@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST, GET } from "@/app/api/pembelian/route";
 import { prisma } from "@/lib/prisma";
 import { config } from "@/lib/config";
+import type { PembelianBahan } from "@prisma/client";
 
 // Mock config
 vi.mock("@/lib/config", () => {
@@ -70,7 +71,7 @@ describe("API /api/pembelian", () => {
       const mockPurchases = [
         { id: "pembelian1", total: 50000, bahanBaku: { nama: "Gula" } },
       ];
-      vi.mocked(prisma.pembelianBahan.findMany).mockResolvedValue(mockPurchases as any);
+      vi.mocked(prisma.pembelianBahan.findMany).mockResolvedValue(mockPurchases as unknown as PembelianBahan[]);
 
       const response = await GET(new Request("http://localhost/api/pembelian"));
       const json = await response.json();
@@ -118,7 +119,7 @@ describe("API /api/pembelian", () => {
       });
 
       let capturedTx: any;
-      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
+      vi.mocked(prisma.$transaction).mockImplementation(async (cb: (tx: any) => Promise<any>) => {
         const tx = {
           pembelianBahan: {
             create: vi.fn().mockResolvedValue({ id: "pembelian1", total: 50000 }),

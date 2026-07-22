@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["bcryptjs"],
+  logging: {
+    fetches: { fullUrl: true },
+  },
   async headers() {
     return [
       {

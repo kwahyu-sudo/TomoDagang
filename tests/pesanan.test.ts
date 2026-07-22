@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { POST, PATCH } from "@/app/api/pesanan/route";
 import { prisma } from "@/lib/prisma";
+import type { Pesanan, PesananItem, Produk } from "@prisma/client";
 
 // Mock prisma
 vi.mock("@/lib/prisma", () => {
@@ -84,7 +85,7 @@ describe("API /api/pesanan", () => {
         status: "BARU",
       };
 
-      vi.mocked(prisma.pesanan.create).mockResolvedValue(mockCreatedPesanan as any);
+      vi.mocked(prisma.pesanan.create).mockResolvedValue(mockCreatedPesanan as unknown as Pesanan);
 
       const response = await POST(mockRequest);
       const json = await response.json();
@@ -115,7 +116,7 @@ describe("API /api/pesanan", () => {
         ],
       };
 
-      vi.mocked(prisma.pesanan.findUnique).mockResolvedValue(mockPesanan as any);
+      vi.mocked(prisma.pesanan.findUnique).mockResolvedValue(mockPesanan as unknown as Pesanan);
 
       const mockRequest = new Request("http://localhost/api/pesanan", {
         method: "PATCH",
@@ -128,7 +129,7 @@ describe("API /api/pesanan", () => {
 
       // Setup transactional mock behaviors
       let capturedTx: any;
-      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
+      vi.mocked(prisma.$transaction).mockImplementation(async (cb: (tx: any) => Promise<any>) => {
         const tx = {
           produk: {
             findUnique: vi.fn().mockResolvedValue({ id: "prod1", stok: 10 }),
@@ -186,7 +187,7 @@ describe("API /api/pesanan", () => {
         ],
       };
 
-      vi.mocked(prisma.pesanan.findUnique).mockResolvedValue(mockPesanan as any);
+      vi.mocked(prisma.pesanan.findUnique).mockResolvedValue(mockPesanan as unknown as Pesanan);
 
       const mockRequest = new Request("http://localhost/api/pesanan", {
         method: "PATCH",
@@ -196,7 +197,7 @@ describe("API /api/pesanan", () => {
         }),
       });
 
-      vi.mocked(prisma.$transaction as any).mockImplementation(async (cb: any) => {
+      vi.mocked(prisma.$transaction).mockImplementation(async (cb: (tx: any) => Promise<any>) => {
         const tx = {
           produk: {
             findUnique: vi.fn().mockResolvedValue({ id: "prod1", stok: 3 }), // Only 3 in stock, but request needs 5

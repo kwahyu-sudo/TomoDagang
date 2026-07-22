@@ -4,7 +4,7 @@ import SummaryCard from "@/components/SummaryCard";
 import Table from "@/components/Table";
 
 export default async function KeuanganPage() {
-  const tr = await prisma.transaksi.findMany({ orderBy: { tanggal: "desc" } });
+  const tr = await prisma.transaksi.findMany({ orderBy: { tanggal: "desc" }, take: 50 });
   const masuk = tr.filter((t) => t.tipe === "PEMASUKAN").reduce((s, t) => s + t.jumlah, 0);
   const keluar = tr.filter((t) => t.tipe === "PENGELUARAN").reduce((s, t) => s + t.jumlah, 0);
   const laba = masuk - keluar;

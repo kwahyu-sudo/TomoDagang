@@ -8,6 +8,7 @@ export default async function AnalitikPage() {
   const pesanan = await prisma.pesanan.findMany({
     where: { status: "SELESAI" },
     include: { items: true },
+    take: 500,
   });
 
   const daily = new Map<string, number>();

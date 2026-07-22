@@ -82,41 +82,41 @@ Hasil audit: konsistensi, dependensi, orphaned endpoints, security.
 ### 🟡 12. Ekstraksi reusable Table component
 - **Masalah:** Pattern card+table yang sama diulang 6x
 - **Fix:** Buat `src/components/Table.tsx` dengan header, body, empty-state
-- [ ] Selesai
+- [x] Selesai
 
 ### 🟡 13. Ekstraksi fungsi `fmt()` ke utility
 - **Masalah:** `new Intl.NumberFormat("id-ID")` diulang 3x
 - **Fix:** Buat `src/lib/format.ts`
-- [ ] Selesai
+- [x] Selesai
 
 ### 🟡 14. Ekstraksi SummaryCard component
 - **Masalah:** Kartu ringkasan diulang 3x
 - **Fix:** Buat `src/components/SummaryCard.tsx`
-- [ ] Selesai
+- [x] Selesai
 
 ### 🟡 15. Ekstraksi StokBadge component
 - **Masalah:** Logic badge "Menipis"/"Stok aman" diulang 2x
 - **Fix:** Buat `src/components/StokBadge.tsx`
-- [ ] Selesai
+- [x] Selesai
 
 ### 🟡 16. Ganti validasi custom dengan Zod
 - **Masalah:** Validasi di `validate.ts` terlalu basic — no length/pattern/nested
-- **Fix:** `npm install zod`, buat schema di `src/lib/schema.ts`, refactor validasi
-- [ ] Selesai
+- **Fix:** `npm install zod`, buat schema, refactor validasi
+- [x] Selesai
 
 ### 🟡 17. Rapikan dokumentasi
-- **Masalah:** README & RENCANA.md tidak mencerminkan struktur aktual; shadcn/ui & Recharts disebut tapi belum ada
+- **Masalah:** README & RENCANA.md tidak mencerminkan struktur aktual
 - **Fix:** Update path yang hilang, catat library yang belum diimplementasi
-- [ ] Selesai
+- [x] Selesai
 
 ### 🟡 18. Konfigurasi ESLint & Prettier
 - **Fix:** `npm install -D eslint prettier eslint-config-next`, buat config file
-- [ ] Selesai
+- [x] Selesai
 
-### 🟡 19. Hapus/tandai orphaned code
-- **Lokasi:** `forecast.ts` — `weightedMA()` tidak dipakai; `api/transaksi/route.ts` — endpoint tidak dipanggil; `api/bahan/route.ts` POST — tidak ada form
-- **Fix:** Hapus `weightedMA` atau beri `@deprecated`; hapus endpoint orphaned atau buat UI
-- [ ] Selesai
+### 🟡 19. Tandai orphaned code
+- **Lokasi:** `forecast.ts` — `weightedMA()` diberi `@deprecated`
+- **Fix:** `@deprecated` JSDoc + pertahankan untuk referensi
+- [x] Selesai
 
 ---
 

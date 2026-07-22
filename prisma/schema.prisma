@@ -30,6 +30,11 @@ enum TipeTransaksi {
   PENGELUARAN
 }
 
+enum TipeStokLog {
+  PRODUK
+  BAHAN
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -110,7 +115,7 @@ model PesananItem {
 
 model StokLog {
   id         String   @id @default(cuid())
-  tipe       String   // "PRODUK" | "BAHAN"
+  tipe       TipeStokLog
   refId      String   // ID of Produk or BahanBaku depending on tipe
   delta      Int
   keterangan String
@@ -126,7 +131,7 @@ model PembelianBahan {
   total         Int
   sumber        SumberPembelian @default(BELANJA_SENDIRI)
   supplierId    String?
-  catatan       String
+  catatan       String?
   bahanBaku     BahanBaku       @relation(fields: [bahanBakuId], references: [id])
   supplier      Supplier?       @relation(fields: [supplierId], references: [id])
   transaksi     Transaksi?
