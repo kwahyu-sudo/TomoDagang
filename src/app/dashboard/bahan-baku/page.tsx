@@ -3,7 +3,7 @@ import { config } from "@/lib/config";
 import CatatPembelianForm from "@/components/CatatPembelianForm";
 
 export default async function BahanPage() {
-  const bahan = await prisma.bahanBaku.findMany({ orderBy: { nama: "asc" } });
+  const bahan = await prisma.bahanBaku.findMany({ where: { deletedAt: null }, orderBy: { nama: "asc" } });
 
   return (
     <div className="space-y-4u">

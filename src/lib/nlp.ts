@@ -45,7 +45,7 @@ export function parseMessage(text: string, products: { nama: string }[]): Parsed
   const knownNames = products.map((p) => p.nama.toLowerCase());
   const tokens = lower.split(/[^a-z0-9.\s]/i);
   for (const t of tokens) {
-    const tm = t.match(/([a-z\s]+?)\s*(\d+(?:\.\d{3})*(?:\.\d+)?|${Object.keys(WORD_NUMBERS).join("|")})/i);
+    const tm = t.match(new RegExp(`([a-z\\s]+?)\\s*(\\d+(?:\\.\\d{3})*(?:\\.\\d+)?|${Object.keys(WORD_NUMBERS).join("|")})`, "i"));
     if (tm && /\d/.test(t)) {
       const name = tm[1].trim().toLowerCase();
       if (name && !knownNames.includes(name) && !KEYWORDS.includes(name)) {

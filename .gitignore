@@ -8,3 +8,5 @@ tsconfig.tsbuildinfo
 playwright-report/
 test-results/
 .db/db url.txt
+# Added by code-review-graph
+.code-review-graph/

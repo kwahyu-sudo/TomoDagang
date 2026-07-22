@@ -4,7 +4,7 @@ const fmt = (n: number) => new Intl.NumberFormat("id-ID").format(n);
 
 export default async function DashboardHome() {
   const [produk, pesanan, tr] = await Promise.all([
-    prisma.produk.findMany(),
+    prisma.produk.findMany({ where: { deletedAt: null } }),
     prisma.pesanan.findMany(),
     prisma.transaksi.findMany(),
   ]);
