@@ -47,7 +47,7 @@ export const PATCH = apiHandler(async (req: Request) => {
   if (deny) return deny;
   const { id, status, paid } = await req.json();
   const pesanan = await prisma.pesanan.findUnique({ where: { id }, include: { items: true } });
-  if (!pesanan) return new NextResponse("not found", { status: 404 });
+  if (!pesanan) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   await prisma.$transaction(async (tx) => {
     if (status === "SELESAI") {

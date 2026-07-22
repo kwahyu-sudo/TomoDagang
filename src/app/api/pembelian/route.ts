@@ -21,7 +21,7 @@ export const POST = apiHandler(async (req: Request) => {
   if (deny) return deny;
   const b = await req.json();
   if (b.sumber === "SUPPLIER" && !config.supplierEnabled) {
-    return new NextResponse("supplier disabled", { status: 400 });
+    return NextResponse.json({ error: "supplier disabled" }, { status: 400 });
   }
   validatePositiveInt(b.qty, "qty");
   validateNonNegativeInt(b.hargaSatuan, "hargaSatuan");

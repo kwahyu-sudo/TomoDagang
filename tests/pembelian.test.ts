@@ -101,8 +101,8 @@ describe("API /api/pembelian", () => {
 
       const response = await POST(mockRequest);
       expect(response.status).toBe(400);
-      const text = await response.text();
-      expect(text).toBe("supplier disabled");
+      const json = await response.json();
+      expect(json).toEqual({ error: "supplier disabled" });
     });
 
     it("should accept BELANJA_SENDIRI and perform all database updates atomically", async () => {

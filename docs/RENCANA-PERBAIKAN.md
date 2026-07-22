@@ -82,41 +82,41 @@ Hasil audit: konsistensi, dependensi, orphaned endpoints, security.
 ### 🟡 12. Ekstraksi reusable Table component
 - **Masalah:** Pattern card+table yang sama diulang 6x
 - **Fix:** Buat `src/components/Table.tsx` dengan header, body, empty-state
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 13. Ekstraksi fungsi `fmt()` ke utility
 - **Masalah:** `new Intl.NumberFormat("id-ID")` diulang 3x
 - **Fix:** Buat `src/lib/format.ts`
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 14. Ekstraksi SummaryCard component
 - **Masalah:** Kartu ringkasan diulang 3x
 - **Fix:** Buat `src/components/SummaryCard.tsx`
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 15. Ekstraksi StokBadge component
 - **Masalah:** Logic badge "Menipis"/"Stok aman" diulang 2x
 - **Fix:** Buat `src/components/StokBadge.tsx`
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 16. Ganti validasi custom dengan Zod
 - **Masalah:** Validasi di `validate.ts` terlalu basic — no length/pattern/nested
 - **Fix:** `npm install zod`, buat schema di `src/lib/schema.ts`, refactor validasi
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 17. Rapikan dokumentasi
 - **Masalah:** README & RENCANA.md tidak mencerminkan struktur aktual; shadcn/ui & Recharts disebut tapi belum ada
 - **Fix:** Update path yang hilang, catat library yang belum diimplementasi
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 18. Konfigurasi ESLint & Prettier
 - **Fix:** `npm install -D eslint prettier eslint-config-next`, buat config file
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟡 19. Hapus/tandai orphaned code
 - **Lokasi:** `forecast.ts` — `weightedMA()` tidak dipakai; `api/transaksi/route.ts` — endpoint tidak dipanggil; `api/bahan/route.ts` POST — tidak ada form
 - **Fix:** Hapus `weightedMA` atau beri `@deprecated`; hapus endpoint orphaned atau buat UI
-- [x] Selesai
+- [ ] Selesai
 
 ---
 
@@ -125,29 +125,29 @@ Hasil audit: konsistensi, dependensi, orphaned endpoints, security.
 ### 🟢 20. Ubah `StokLog.tipe` dari String jadi enum
 - **Lokasi:** `prisma/schema.prisma:101`
 - **Fix:** Tambah enum `TipeStokLog { PRODUK BAHAN }`
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟢 21. Ubah `PembelianBahan.catatan` jadi `String?`
 - **Lokasi:** `prisma/schema.prisma:117`
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟢 22. Konfigurasi WhatsApp API version
 - **Lokasi:** `src/lib/whatsapp.ts:16` — hardcoded `v19.0`
 - **Fix:** Pindahkan ke env var atau konstanta
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟢 23. Bersihkan `as any` di test mocks
 - **Lokasi:** `tests/pesanan.test.ts` (4×), `tests/pembelian.test.ts` (3×)
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟢 24. Konfigurasi production Next.js
 - **Lokasi:** `next.config.ts` — masih kosong
 - **Fix:** Tambah `images.domains`, `compression`, `logging`, dll
-- [x] Selesai
+- [ ] Selesai
 
 ### 🟢 25. Pagination di dashboard
 - **Lokasi:** Semua halaman dashboard kecuali `stok/log/`
-- [x] Selesai
+- [ ] Selesai
 
 ---
 

@@ -47,6 +47,8 @@ model Produk {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   items     PesananItem[]
+
+  @@index([deletedAt])
 }
 
 model BahanBaku {
@@ -58,6 +60,8 @@ model BahanBaku {
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   pembelian PembelianBahan[]
+
+  @@index([deletedAt])
 }
 
 model Transaksi {
@@ -70,6 +74,8 @@ model Transaksi {
   pembelianId String?       @unique
   pesanan     Pesanan?      @relation(fields: [pesananId], references: [id])
   pembelian   PembelianBahan? @relation(fields: [pembelianId], references: [id])
+
+  @@index([tipe, tanggal])
 }
 
 model Pesanan {
@@ -84,6 +90,9 @@ model Pesanan {
   createdAt   DateTime      @default(now())
   items       PesananItem[]
   transaksi   Transaksi?
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 model PesananItem {
@@ -94,6 +103,9 @@ model PesananItem {
   harga     Int
   pesanan   Pesanan @relation(fields: [pesananId], references: [id], onDelete: Cascade)
   produk    Produk  @relation(fields: [produkId], references: [id])
+
+  @@index([pesananId])
+  @@index([produkId])
 }
 
 model StokLog {
@@ -118,6 +130,10 @@ model PembelianBahan {
   bahanBaku     BahanBaku       @relation(fields: [bahanBakuId], references: [id])
   supplier      Supplier?       @relation(fields: [supplierId], references: [id])
   transaksi     Transaksi?
+
+  @@index([bahanBakuId])
+  @@index([supplierId])
+  @@index([tanggal])
 }
 
 model Supplier {

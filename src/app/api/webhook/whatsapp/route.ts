@@ -13,14 +13,14 @@ export async function GET(req: NextRequest) {
   if (mode === "subscribe" && token === process.env.WHATSAPP_VERIFY_TOKEN) {
     return new NextResponse(challenge ?? "", { status: 200 });
   }
-  return new NextResponse("Forbidden", { status: 403 });
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   const sig = req.headers.get("x-hub-signature-256");
   if (!verifySignature(raw, sig, process.env.WHATSAPP_APP_SECRET ?? "")) {
-    return new NextResponse("Invalid signature", { status: 401 });
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
   const body = JSON.parse(raw);
   const entry = body.entry?.[0];
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         } catch {
           // abaikan gagal kirim
         }
-        return new NextResponse("ok");
+        return NextResponse.json({ ok: true });
       }
 
       // Atomic: dedupe (P2002) + create pesanan dalam satu transaksi.
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       } catch (err: unknown) {
         // P2002 = messageId sudah diproses (dedupe aman, retry diizinkan karena belum ke-create).
         if ((err as { code?: string })?.code === "P2002") {
-          return new NextResponse("ok");
+          return NextResponse.json({ ok: true });
         }
         throw err;
       }
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       } catch {
         // draft tetap tersimpan walau notifikasi gagal
       }
-      return new NextResponse(JSON.stringify({ ok: true }));
+      return NextResponse.json({ ok: true });
     }
     try {
       await sendMessage(msg.from, "Halo! Ketik PESAN <nama produk> <jumlah> untuk order.");
@@ -87,5 +87,5 @@ export async function POST(req: NextRequest) {
       // abaikan gagal kirim balasan
     }
   }
-  return new NextResponse("ok");
+  return NextResponse.json({ ok: true });
 }

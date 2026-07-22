@@ -13,7 +13,7 @@ export async function sendMessage(to: string, text: string): Promise<void> {
   const token = process.env.WHATSAPP_TOKEN;
   const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   if (!token || !phoneId) throw new Error("WA env missing");
-  await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+  const res = await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -23,4 +23,8 @@ export async function sendMessage(to: string, text: string): Promise<void> {
       text: { body: text },
     }),
   });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`WA API error ${res.status}: ${body}`);
+  }
 }
