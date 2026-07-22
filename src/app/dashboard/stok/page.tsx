@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import TambahProdukForm from "@/components/TambahProdukForm";
+import StokBadge from "@/components/StokBadge";
+import Table from "@/components/Table";
 
 export default async function StokPage() {
   const produk = await prisma.produk.findMany({ where: { deletedAt: null }, orderBy: { nama: "asc" } });
@@ -17,41 +19,24 @@ export default async function StokPage() {
         <TambahProdukForm />
       </header>
 
-      <div className="card overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-canvas">
-            <tr>
-              <th className="th">Nama</th>
-              <th className="th">Stok</th>
-              <th className="th">Min</th>
-              <th className="th">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {produk.map((p) => (
-              <tr key={p.id}>
-                <td className="td font-medium">{p.nama}</td>
-                <td className="td">{p.stok} {p.satuan}</td>
-                <td className="td text-ink-faint">{p.minStok}</td>
-                <td className="td">
-                  {p.stok < p.minStok ? (
-                    <span className="badge-warn">Menipis</span>
-                  ) : (
-                    <span className="badge-ok">Stok aman</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {produk.length === 0 && (
-              <tr>
-                <td className="td text-ink-faint" colSpan={4}>
-                  Belum ada produk. Tambah lewat tombol di atas.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={[
+          { key: "nama", label: "Nama" },
+          { key: "stok", label: "Stok" },
+          { key: "min", label: "Min" },
+          { key: "status", label: "Status" },
+        ]}
+        data={produk}
+        renderRow={(p) => (
+          <>
+            <td className="td font-medium">{p.nama}</td>
+            <td className="td">{p.stok} {p.satuan}</td>
+            <td className="td text-ink-faint">{p.minStok}</td>
+            <td className="td"><StokBadge stok={p.stok} minStok={p.minStok} /></td>
+          </>
+        )}
+        emptyText="Belum ada produk. Tambah lewat tombol di atas."
+      />
     </div>
   );
 }

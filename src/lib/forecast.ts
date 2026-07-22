@@ -5,6 +5,7 @@ export function movingAverage(history: number[], window: number): number {
   return slice.reduce((a, b) => a + b, 0) / slice.length;
 }
 
+/** @deprecated Tidak dipakai di aplikasi — dipertahankan untuk referensi/tes */
 export function weightedMA(history: number[], weights: number[]): number {
   if (history.length !== weights.length) {
     throw new Error("history & weights length must match");

@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { fmt } from "@/lib/format";
+import Table from "@/components/Table";
 
 export default async function PesananPage() {
   const pesanan = await prisma.pesanan.findMany({
@@ -17,48 +19,35 @@ export default async function PesananPage() {
         {draft > 0 && <span className="badge-warn">{draft} draft perlu review</span>}
       </header>
 
-      <div className="card overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-canvas">
-            <tr>
-              <th className="th">Pelanggan</th>
-              <th className="th">Total</th>
-              <th className="th">Status</th>
-              <th className="th">Sumber</th>
-              <th className="th">Bayar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pesanan.map((p) => (
-              <tr key={p.id}>
-                <td className="td font-medium">
-                  {p.pelanggan}
-                  {p.needsReview && <span className="badge-warn ml-2">review</span>}
-                </td>
-                <td className="td">Rp{new Intl.NumberFormat("id-ID").format(
-                  p.total || p.items.reduce((s, it) => s + it.qty * it.harga, 0)
-                )}</td>
-                <td className="td">
-                  <span className="badge-ok">{p.status}</span>
-                </td>
-                <td className="td text-ink-faint">{p.sumber}</td>
-                <td className="td">
-                  {p.paid ? (
-                    <span className="badge-ok">Lunas</span>
-                  ) : (
-                    <span className="badge-warn">Belum</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {pesanan.length === 0 && (
-              <tr>
-                <td className="td text-ink-faint" colSpan={5}>Belum ada pesanan.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        columns={[
+          { key: "pelanggan", label: "Pelanggan" },
+          { key: "total", label: "Total" },
+          { key: "status", label: "Status" },
+          { key: "sumber", label: "Sumber" },
+          { key: "bayar", label: "Bayar" },
+        ]}
+        data={pesanan}
+        renderRow={(p) => (
+          <>
+            <td className="td font-medium">
+              {p.pelanggan}
+              {p.needsReview && <span className="badge-warn ml-2">review</span>}
+            </td>
+            <td className="td">Rp{fmt(p.total || p.items.reduce((s, it) => s + it.qty * it.harga, 0))}</td>
+            <td className="td"><span className="badge-ok">{p.status}</span></td>
+            <td className="td text-ink-faint">{p.sumber}</td>
+            <td className="td">
+              {p.paid ? (
+                <span className="badge-ok">Lunas</span>
+              ) : (
+                <span className="badge-warn">Belum</span>
+              )}
+            </td>
+          </>
+        )}
+        emptyText="Belum ada pesanan."
+      />
     </div>
   );
 }

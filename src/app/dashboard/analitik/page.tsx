@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { fmt } from "@/lib/format";
 import { movingAverage } from "@/lib/forecast";
-
-const fmt = (n: number) => new Intl.NumberFormat("id-ID").format(Math.round(n));
+import SummaryCard from "@/components/SummaryCard";
+import Table from "@/components/Table";
 
 export default async function AnalitikPage() {
   const pesanan = await prisma.pesanan.findMany({
@@ -28,37 +29,31 @@ export default async function AnalitikPage() {
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4u">
-        <div className="card p-4u">
-          <p className="text-sm text-ink-faint">Total Omzet (selesai)</p>
-          <p className="text-2xl font-semibold text-ink mt-1">Rp{fmt(totalOmzet)}</p>
-        </div>
-        <div className="card p-4u border-accent/30">
-          <p className="text-sm text-ink-faint">Perkiraan Omzet 7 Hari</p>
-          <p className="text-2xl font-semibold text-accent-ink mt-1">Rp{fmt(forecast)}</p>
-          <p className="text-xs text-ink-faint mt-2">
-            Perkiraan statistik, bukan jaminan. Buta terhadap hari besar, promo, atau stok habis.
-          </p>
-        </div>
+        <SummaryCard label="Total Omzet (selesai)" value={`Rp${fmt(Math.round(totalOmzet))}`} />
+        <SummaryCard
+          label="Perkiraan Omzet 7 Hari"
+          value={`Rp${fmt(Math.round(forecast))}`}
+          tone="text-accent-ink"
+          border="border-accent/30"
+          footnote="Perkiraan statistik, bukan jaminan. Buta terhadap hari besar, promo, atau stok habis."
+        />
       </div>
 
       <section className="card p-4u">
         <h2 className="text-lg font-semibold text-ink mb-4u">Proyeksi per Hari (Moving Average)</h2>
-        <table className="w-full">
-          <thead className="bg-canvas">
-            <tr>
-              <th className="th">Hari ke-</th>
-              <th className="th">Estimasi Omzet</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 7 }).map((_, i) => (
-              <tr key={i}>
-                <td className="td font-medium">+{i + 1}</td>
-                <td className="td">Rp{fmt(forecast)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          columns={[
+            { key: "hari", label: "Hari ke-" },
+            { key: "estimasi", label: "Estimasi Omzet" },
+          ]}
+          data={Array.from({ length: 7 }).map((_, i) => ({ day: i + 1 }))}
+          renderRow={(d) => (
+            <>
+              <td className="td font-medium">+{d.day}</td>
+              <td className="td">Rp{fmt(Math.round(forecast))}</td>
+            </>
+          )}
+        />
       </section>
     </div>
   );

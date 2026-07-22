@@ -28,8 +28,10 @@ npm install
 ### 2. Konfigurasi Environment
 Salin berkas `.env.example` ke `.env` dan isi variabel berikut:
 ```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/umkm
+DATABASE_URL=postgresql://user:pass@host:5432/db
+DIRECT_URL=postgresql://user:pass@host:5432/db
 WHATSAPP_TOKEN=your_token
+WHATSAPP_APP_SECRET=your_app_secret
 WHATSAPP_PHONE_NUMBER_ID=your_id
 WHATSAPP_VERIFY_TOKEN=your_verify_token
 WHATSAPP_BUSINESS_ACCOUNT_ID=your_business_account_id
@@ -65,23 +67,28 @@ npm run start
 ## Struktur Proyek
 ```
 TomoDagang/
-├─ prisma/schema.prisma
+├─ prisma/
+│  ├─ schema.prisma
+│  └─ migrations/
 ├─ src/
 │  ├─ app/
 │  │  ├─ (auth)/login/
 │  │  ├─ dashboard/
 │  │  │  ├─ stok/
+│  │  │  │  └─ log/
 │  │  │  ├─ bahan-baku/
 │  │  │  ├─ keuangan/
 │  │  │  ├─ pesanan/
 │  │  │  └─ analitik/
 │  │  └─ api/
-│  │     ├─ webhook/whatsapp/route.ts
+│  │     ├─ auth/[...nextauth]/
+│  │     ├─ webhook/whatsapp/
 │  │     ├─ produk/  bahan/  transaksi/  pesanan/  pembelian/
-│  ├─ lib/ (prisma, whatsapp, auth, forecast, nlp, validate, config)
-│  ├─ components/ (TambahProdukForm, CatatPembelianForm)
+│  ├─ lib/ (prisma, whatsapp, auth, forecast, nlp, validate, config, format)
+│  ├─ components/ (TambahProdukForm, CatatPembelianForm, Table, SummaryCard, StokBadge)
 ├─ tests/
-├─ docs/runbook.md
+├─ docs/ (runbook, audit-keamanan, CHANGELOG, RENCANA-PERBAIKAN)
+├─ prisma/migrations/
 ├─ .env.example
 ```
 

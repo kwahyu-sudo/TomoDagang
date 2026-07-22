@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-
-const fmt = (n: number) => new Intl.NumberFormat("id-ID").format(n);
+import { fmt } from "@/lib/format";
+import SummaryCard from "@/components/SummaryCard";
 
 export default async function DashboardHome() {
   const [produk, pesanan, tr] = await Promise.all([
@@ -26,10 +26,7 @@ export default async function DashboardHome() {
       <h1 className="text-2xl font-semibold text-ink">Ringkasan</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4u">
         {cards.map((c) => (
-          <div key={c.label} className="card p-4u">
-            <p className="text-sm text-ink-faint">{c.label}</p>
-            <p className={`text-2xl font-semibold mt-1 ${c.tone}`}>{c.value}</p>
-          </div>
+          <SummaryCard key={c.label} label={c.label} value={c.value} tone={c.tone} />
         ))}
       </div>
     </div>

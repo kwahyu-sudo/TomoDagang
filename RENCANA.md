@@ -9,9 +9,9 @@ Dashboard internal **single-tenant** untuk satu UMKM: pencatatan stok, bahan bak
 - **Next.js 15 (App Router)** — full-stack, UI + API routes dalam satu proyek
 - **TypeScript**
 - **Prisma ORM + PostgreSQL**
-- **Tailwind CSS + shadcn/ui** — komponen dashboard cepat & rapi
+- **Tailwind CSS** — styling (shadcn/ui direncanakan tapi belum diimplementasi)
 - **NextAuth (credentials)** — login pemilik/staff
-- **Recharts** — grafik tren & forecast
+- **Recharts** — grafik tren & forecast (direncanakan tapi belum diimplementasi)
 - **WhatsApp Cloud API** — webhook (terima) + Graph API (kirim)
 
 ## Struktur Proyek
